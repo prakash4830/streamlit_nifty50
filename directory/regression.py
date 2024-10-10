@@ -13,7 +13,6 @@ from statsmodels.stats.diagnostic import het_breuschpagan
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-from pandas_datareader import wb
 from utils.sidebar import render_sidebar, display_copyright
 import requests
 import warnings
@@ -142,28 +141,46 @@ def fetch_economic_data(start_year, end_year):
     Returns:
     - pd.DataFrame: A DataFrame containing the Year and Inflation Rate (%).
     """
-    indicators = {
-        'Inflation Rate': 'FP.CPI.TOTL.ZG',  # Inflation rate (Consumer Prices)
-    }
-    data = {}
-    for indicator_name, indicator_code in indicators.items():
-        df = wb.download(indicator=indicator_code, country='IND', start=start_year, end=end_year)
-        data[indicator_name] = df
-    economic_df = pd.concat(data.values(), axis=1)
-    economic_df.columns = data.keys()
-    economic_df.reset_index(inplace=True)
-    economic_df.rename(columns={'year': 'Year'}, inplace=True)
+    # Define the World Bank API endpoint
+    indicator_code = 'FP.CPI.TOTL.ZG'  # Inflation rate (Consumer Prices)
+    country_code = 'IND'  # India
+    per_page = 100  # Number of records per page (adjust if needed)
 
-    # Drop the 'country' column to remove non-numeric data
-    if 'country' in economic_df.columns:
-        economic_df = economic_df.drop(columns=['country'])
+    # Construct the API URL
+    url = (
+        f"https://api.worldbank.org/v2/country/{country_code}/indicator/{indicator_code}"
+        f"?date={start_year}:{end_year}&format=json&per_page={per_page}"
+    )
 
-    economic_df['Year'] = pd.to_numeric(economic_df['Year'], errors='coerce').astype('Int64')
-    economic_df['Inflation Rate'] = pd.to_numeric(economic_df['Inflation Rate'], errors='coerce')
-    economic_df.dropna(inplace=True)
-    economic_df = economic_df.sort_values(by='Year', ascending=True).reset_index(drop=True)
+    # Make the API request
+    response = requests.get(url)
+    economic_df = pd.DataFrame()
+
+    if response.status_code == 200:
+        try:
+            data = response.json()
+            if len(data) < 2:
+                st.warning("No data found in the response for Inflation Rate.")
+            else:
+                records = data[1]  # The second element contains the data
+                # Convert records to DataFrame
+                economic_df = pd.DataFrame(records)
+                # Select relevant columns
+                economic_df = economic_df[['date', 'value']]
+                economic_df.columns = ['Year', 'Inflation Rate (%)']
+                # Convert Year to integer and Inflation Rate to float
+                economic_df['Year'] = pd.to_numeric(economic_df['Year'], errors='coerce').astype('Int64')
+                economic_df['Inflation Rate (%)'] = pd.to_numeric(economic_df['Inflation Rate (%)'], errors='coerce')
+                # Drop rows with missing values
+                economic_df.dropna(inplace=True)
+                # Sort by Year ascending
+                economic_df = economic_df.sort_values(by='Year').reset_index(drop=True)
+        except (ValueError, KeyError, IndexError) as e:
+            st.error(f"Error processing the Inflation Rate data: {e}")
+    else:
+        st.error(f"Failed to retrieve Inflation Rate data. HTTP Status Code: {response.status_code}")
+
     return economic_df
-
 
 @st.cache_data
 def fetch_exchange_rate(start_year, end_year):
@@ -260,11 +277,9 @@ def run_regression_analysis(poly_degree=None,interaction_only=None, ridge_alpha=
     # ---------------------------
     st.header("2. Inflation Rate for India")
     try:
-        economic_data = fetch_economic_data(start_year=start_year, end_year=end_year)
-        if not economic_data.empty:
-            st.dataframe(
-                economic_data[['Year', 'Inflation Rate']].rename(columns={'Inflation Rate': 'Inflation Rate (%)'})
-            )
+        inflation_ind = fetch_economic_data(start_year=start_year, end_year=end_year)
+        if not inflation_ind.empty:
+            st.dataframe(inflation_ind)
         else:
             st.warning("Inflation Rate data is empty.")
     except Exception as e:
@@ -386,10 +401,10 @@ def run_regression_analysis(poly_degree=None,interaction_only=None, ridge_alpha=
     st.header("7. Merge All Data into a Single DataFrame")
 
     if not (
-            nifty50_annual_mean.empty or sp500_annual_mean.empty or economic_data.empty or gdp_ind.empty or
+            nifty50_annual_mean.empty or sp500_annual_mean.empty or inflation_ind.empty or gdp_ind.empty or
             exchange_rate_final.empty):
         # Merge Nifty 50 annual mean data
-        data = nifty50_annual_mean.merge(economic_data, on='Year', how='inner')
+        data = nifty50_annual_mean.merge(inflation_ind, on='Year', how='inner')
 
         # Merge GDP Growth Rate
         data = data.merge(gdp_ind, on='Year', how='inner')
@@ -444,7 +459,7 @@ def run_regression_analysis(poly_degree=None,interaction_only=None, ridge_alpha=
 
     if not data.empty:
         y = data['Nifty50_Annual_Mean_Log_Returns']
-        X = data[['Inflation Rate', 'GDP Growth Rate (%)', 'Exchange_Rate', 'SP500_Annual_Mean_Log_Returns']]
+        X = data[['Inflation Rate (%)', 'GDP Growth Rate (%)', 'Exchange_Rate', 'SP500_Annual_Mean_Log_Returns']]
 
         st.subheader("Independent Variables (X)")
         st.dataframe(X)
@@ -719,7 +734,7 @@ def run_regression_analysis(poly_degree=None,interaction_only=None, ridge_alpha=
         st.subheader("12. Polynomial Regression with Ridge Regularization")
         with st.expander("View Polynomial Ridge Regression Details"):
             # Define independent variables
-            X_poly = data[['Inflation Rate', 'GDP Growth Rate (%)', 'Exchange_Rate', 'SP500_Annual_Mean_Log_Returns']]
+            X_poly = data[['Inflation Rate (%)', 'GDP Growth Rate (%)', 'Exchange_Rate', 'SP500_Annual_Mean_Log_Returns']]
 
             # Create polynomial features
             poly = PolynomialFeatures(degree=2, include_bias=False)
@@ -762,7 +777,7 @@ def run_regression_analysis(poly_degree=None,interaction_only=None, ridge_alpha=
         st.subheader("13. Final Regression Model with Lagged Variables")
         with st.expander("View Lagged Regression Model Details"):
             # Example of incorporating lagged variables (lagged by 1 year)
-            data['Inflation Rate_Lag1'] = data['Inflation Rate'].shift(1)
+            data['Inflation Rate (%)_Lag1'] = data['Inflation Rate (%)'].shift(1)
             data['GDP Growth Rate (%)_Lag1'] = data['GDP Growth Rate (%)'].shift(1)
             data['Exchange_Rate_Lag1'] = data['Exchange_Rate'].shift(1)
             data['SP500_Log_Returns_Lag1'] = data['SP500_Annual_Mean_Log_Returns'].shift(1)
@@ -773,7 +788,7 @@ def run_regression_analysis(poly_degree=None,interaction_only=None, ridge_alpha=
             if not data_lagged.empty:
                 # Define independent variables with lagged terms
                 X_lagged = data_lagged[
-                    ['Inflation Rate_Lag1', 'GDP Growth Rate (%)_Lag1', 'Exchange_Rate_Lag1', 'SP500_Log_Returns_Lag1']]
+                    ['Inflation Rate (%)_Lag1', 'GDP Growth Rate (%)_Lag1', 'Exchange_Rate_Lag1', 'SP500_Log_Returns_Lag1']]
                 y_lagged = data_lagged['Nifty50_Annual_Mean_Log_Returns']
 
                 # Add constant
