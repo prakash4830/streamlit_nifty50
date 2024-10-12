@@ -10,8 +10,7 @@ import requests
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from statsmodels.tsa.stattools import adfuller, kpss
-from statsmodels.tsa.ar_model import AutoReg
-from statsmodels.tsa.arima.model import ARIMA
+
 # ---------------------------
 # Data Fetching Functions
 # ---------------------------
@@ -234,18 +233,36 @@ def stationary_plot(data):
 
     return fig
 
-def interpret_stationarity(adf, kps):
+def adf_interpret(adf, adf_critical_values):
     # Interpret ADF Test
     if adf[1] < 0.05:
-        st.success(f"ADF Test: Data is stationary, because the ***p-value:*** {adf[1]} < 0.05")
+        st.success(f"ADF Test: The series is stationary (reject the null hypothesis), because the "
+                   f"***p-value:*** {adf[1]} < 0.05.")
     else:
-        st.warning(f"ADF Test: Data is non-stationary, because the ***p-value:*** {adf[1]} > 0.05")
+        st.warning(f"ADF Test: The series is non-stationary (fail to reject the null hypothesis), because the "
+                   f"***p-value:*** {adf[1]} > 0.05.")
+    if adf[0] < adf_critical_values['5%']:
+        st.success("ADF Test: The series is stationary (reject the null hypothesis), because the "
+                   "***ADF statistic value*** is lesser than the ***Critical Values***.")
+    else:
+        st.warning("ADF Test: The series is non-stationary (fail to reject the null hypothesis),  because the "
+                   "***ADF statistic value*** is greater than the ***Critical Values***.")
 
+def kpss_interpret(kps, kpss_critical_values):
     # Interpret KPSS Test
-    if kps[1] < 0.05:
-        st.warning(f"KPSS Test: Data is non-stationary, because the ***p-value:*** {kps[1]} > 0.05")
+    if kps[1] > 0.05:
+        st.success(f"KPSS Test: The series is stationary (fail to reject the null hypothesis), because the "
+                   f"***p-value:*** {kps[1]} > 0.05.")
     else:
-        st.success(f"KPSS Test: Data is non-stationary, because the ***p-value:*** {kps[1]} < 0.05")
+        st.warning(f"KPSS Test: The series is non-stationary (reject the null hypothesis), because the "
+                   f"***p-value:*** {kps[1]} < 0.05.")
+    # KPSS Interpretation
+    if kps[0] > kpss_critical_values['5%']:
+        st.warning("KPSS Test: The series is non-stationary (reject the null hypothesis), because the "
+                   "***KPSS statistic value*** is greater than the ***Critical Values***.")
+    else:
+        st.success("KPSS Test: The series is stationary (fail to reject the null hypothesis), because the "
+                   "***KPSS statistic value*** is lesser than the ***Critical Values***.")
 
 def check_stationary(data, chart_name):
     data['Log_Returns'] = np.log(data['Close'] / data['Close'].shift(1))
@@ -259,13 +276,37 @@ def check_stationary(data, chart_name):
     st.plotly_chart(price_vol_fig, use_container_width=True)
 
     adf = adfuller(data['Log_Returns'])
-    # st.markdown(f"**ADF Statistic:** {adf[0]:.4f}")
-    # st.markdown(f"**p-value:** {adf[1]:.4f}")
+    adf_statistic = adf[0]
+    adf_p_value = adf[1]
+    adf_critical_values = adf[4]
+
+    st.subheader("Augmented Dickey-Fuller (ADF) Test")
+    # Display ADF Test Results
+    st.markdown(f"**ADF Statistic:** {adf_statistic:.4f}")
+    st.markdown(f"**p-value:** {adf_p_value:.4f}")
+
+    # Create DataFrame for ADF Critical Values
+    adf_crit_df = pd.DataFrame({
+        "Critical Value": [f"{v:.4f}" for v in adf_critical_values.values()]
+    }, index=adf_critical_values.keys())
+    st.table(adf_crit_df)
+    adf_interpret(adf, adf_critical_values)
 
     kps = kpss(data['Log_Returns'], regression='c')
-    # st.markdown(f"**KPSS Statistic:** {kps[0]:.4f}")
-    # st.markdown(f"**p-value:** {kps[1]:.4f}")
-    interpret_stationarity(adf, kps)
+    kpss_statistic = kps[0]
+    kpss_p_value = kps[1]
+    kpss_critical_values = kps[3]
+    st.subheader("Kwiatkowski-Phillips-Schmidt-Shin (KPSS) Test")
+    # Display KPSS Test Results
+    st.markdown(f"**KPSS Statistic:** {kpss_statistic:.4f}")
+    st.markdown(f"**p-value:** {kpss_p_value:.4f}")
+
+    # Create DataFrame for KPSS Critical Values
+    kpss_crit_df = pd.DataFrame({
+        "Critical Value": [f"{v:.4f}" for v in kpss_critical_values.values()]
+    }, index=kpss_critical_values.keys())
+    st.table(kpss_crit_df)
+    kpss_interpret(kps, kpss_critical_values)
 
 
 def run_eda():

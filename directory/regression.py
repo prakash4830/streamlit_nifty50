@@ -1,5 +1,3 @@
-# pages/1_NIFTY50_regression_Analysis.py
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -404,7 +402,7 @@ def run_regression_analysis():
         The F-statistic also tests for heteroskedasticity. However, its interpretation is similar to the LM test. We 
         primarily focus on the p-value associated with this test.
         - **F-Test p-value= {bp_test[3]:.4f}:**
-        Similar to the LM-Test p-value, the F-Test p-value ({bp_test[1]:.4f}) is greater than 0.05. Therefore, we fail 
+        Similar to the LM-Test p-value, the F-Test p-value ({bp_test[3]:.4f}) is greater than 0.05. Therefore, we fail 
         to reject the null hypothesis and conclude that there is no significant evidence of heteroskedasticity in the 
         model.
 

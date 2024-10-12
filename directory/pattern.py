@@ -1,5 +1,3 @@
-# pages/2_Nifty50_pattern_Analysis.py
-
 import streamlit as st
 import yfinance as yf
 import pandas as pd
