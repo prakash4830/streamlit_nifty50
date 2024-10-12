@@ -16,7 +16,7 @@ def make_circle(image):
     return circular_image
 
 
-def display_profile(image_path, name, roll, mobile, email, linkedIn, qualification, github=None):
+def display_profile(image_path, name, roll, mobile, email, linkedIn, link, qualification, github=None):
     """Displays a developer's profile with an image and contact information."""
     image = Image.open(image_path)
     circular_image = make_circle(image.resize((230, 260)))
@@ -33,7 +33,7 @@ def display_profile(image_path, name, roll, mobile, email, linkedIn, qualificati
         f""" 
         - **Mobile:** {mobile}
         - **Email:** [{email}](mailto:{email})
-        - **LinkedIn:** [{linkedIn}](https://www.linkedin.com/in/{linkedIn}/)
+        - **LinkedIn:** [{linkedIn}](https://www.linkedin.com/in/{link}/)
         """
     )
     if github:
@@ -52,6 +52,7 @@ with col1:
         "+91-6369489092",
         "ananyasid111@gmail.com",
         "ananya-siddharth",
+        "ananya-siddharth-50193521a",
         "Bachelor of Hons Agriculture"
     )
 
@@ -62,6 +63,7 @@ with col2:
         "23MBA0015",
         "+91-9025682538",
         "sandeepmurugesan16@gmail.com",
+        "sandeepmurugesan",
         "sandeepmurugesan",
         "Bachelor of Commerce"
     )
@@ -74,6 +76,7 @@ with col3:
         "+91-9092486777",
         "asnaveen21@gmail.com",
         "naveen-as",
+        "naveen-as-042836285",
         "Mechanical Engineering"
     )
 
@@ -90,6 +93,7 @@ with col4:
         "+91-8754813384",
         "prakash4830jp@gmail.com",
         "jayaprakash-s",
+        "jayaprakash-s",
         "Computer Science and Engineering",
         "prakash4830"  # Adding GitHub account only for Jayaprakash
     )
@@ -102,6 +106,7 @@ with col5:
         "+91-7397791923",
         "manoshekar9@gmail.com",
         "manoj-kumaar",
+        "manoj-kumaar-00762b1b4",
         "Bachelor of Hons Agriculture"
     )
 
