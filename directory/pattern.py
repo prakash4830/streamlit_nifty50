@@ -281,11 +281,11 @@ def perform_seasonal_decomposition(data):
 
 def pattern_analysis():
     # Page Title
-    st.title("📈 Nifty 50 Analysis")
+    st.title(":material/monitoring: Nifty 50 Pattern Analysis")
 
     st.markdown("""
-    This page provides an analysis of the Nifty 50 index, including volatility, moving averages, RSI, and seasonal decomposition.
-    Use the sidebar to select the desired date range for the analysis.
+    In this page provides an analysis of the Nifty 50 index, including volatility, moving averages, RSI, and seasonal 
+    decomposition. Use the sidebar to select the desired date range for the analysis.
     """)
 
     # ---------------------------
@@ -296,6 +296,7 @@ def pattern_analysis():
     end_year = end_date.year
     start_year = start_date.year
     display_copyright()
+
     # ---------------------------
     # Fetch Data
     # ---------------------------
@@ -329,6 +330,17 @@ def pattern_analysis():
     price_vol_fig = make_price_and_volatility_plot(data)
     st.plotly_chart(price_vol_fig, use_container_width=True)
 
+    with st.expander("**Interpretation for Volatality Test**"):
+        st.markdown("""
+
+    - The Nifty 50's closing price has shown a strong upward trend since 2008, with significant growth after 2015. 
+    Despite short-term fluctuations, the index has moved from around 5,000 points to above 25,000 points.
+    - **High Volatility During Two Phases:**
+        - *2008-2009 Global Financial Crisis*
+        - *2020 (COVID-19 Pandemic)*
+
+    """)
+
     st.markdown("---")  # Separator
 
     # ---------------------------
@@ -349,6 +361,28 @@ def pattern_analysis():
     st.header("5. Price Patterns: Moving Averages and RSI")
     price_patterns_fig = make_price_patterns_plot(data)
     st.plotly_chart(price_patterns_fig, use_container_width=True)
+    with st.expander("**Interpretation for MA and RSI Test**"):
+        st.markdown("""
+    **Moving Average:**
+    - **Close Price (Blue):** Represents the actual closing price of the Nifty 50 index over time, showing a 
+    strong upward trend.
+    - **50-Day Simple Moving Average (SMA) (Green):** This smooths out short-term price fluctuations, offering 
+    insight into the intermediate trend.
+    - **200-day Simple Moving Average (SMA) (RED)** remains below the price and the 50-day SMA, indicating 
+    a strong long-term uptrend.
+
+    **RSI:**
+    - **RSI (Purple):** RSI is a momentum indicator that ranges from 0 to 100, used to measure overbought or 
+    oversold conditions.    
+    - **Above 70 (Red Line):** Typically considered overbought, indicating the market might be due for a correction.
+    - **Below 30 (Green Line):** Typically considered oversold, suggesting a potential buying opportunity.
+    
+    **Interpretation:**
+    - *Recent Period:* The RSI hovers near the overbought level, reflecting the strong market momentum as the Nifty 50 
+    reaches new highs. However, this might also signal a possible correction soon.
+    - The RSI suggests that the market has experienced periods of overbought conditions recently, implying potential 
+    short-term corrections or pauses in the upward movement.
+    """)
 
     st.markdown("---")  # Separator
 
@@ -363,6 +397,21 @@ def pattern_analysis():
     else:
         st.warning("Seasonal decomposition could not be performed due to insufficient data or errors.")
 
+    with st.expander("**Interpretation for Seasonality Test**"):
+        st.markdown("""
+    - **Pattern:** It highlights the strong upward trend of the Nifty 50, with some dips during major market corrections.
+    - **Trend:** The trend is consistently upward, with an accelerating rise after 2020. The sharp rise after 2020 
+    suggests strong market recovery and growth momentum.
+    - **Seasonal:** The values oscillate between ~0.98 and 1.02, indicating small but consistent seasonal effects. 
+    The peaks and troughs occur at regular intervals, showing a cyclical pattern likely tied to market cycles like 
+    fiscal years, earnings seasons, or economic reports.
+    - **Residual:** Significant residuals are observed around 2008-2009 and 2020.
+    
+    This Seasonal decomposition helps highlight that the long-term trend drives the Nifty 50’s performance, while 
+    seasonality and irregularities play more minor roles.
+
+    """)
+
     st.markdown("---")  # Separator
 
     # ---------------------------
@@ -373,17 +422,18 @@ def pattern_analysis():
         # Example: Highlighting RSI Overbought/Oversold Conditions
         oversold = data[data['RSI'] < 30]
         overbought = data[data['RSI'] > 70]
-
-        st.subheader("Oversold Conditions (RSI < 30)")
-        if not oversold.empty:
-            st.dataframe(oversold[['Close', 'RSI']])
-        else:
-            st.write("No oversold conditions detected.")
-
-        st.subheader("Overbought Conditions (RSI > 70)")
-        if not overbought.empty:
-            st.dataframe(overbought[['Close', 'RSI']])
-        else:
-            st.write("No overbought conditions detected.")
+        col1, col2 = st.columns(2, gap="small")
+        with col1:
+            st.subheader("Oversold Conditions (RSI < 30)")
+            if not oversold.empty:
+                st.dataframe(oversold[['Close', 'RSI']])
+            else:
+                st.write("No oversold conditions detected.")
+        with col2:
+            st.subheader("Overbought Conditions (RSI > 70)")
+            if not overbought.empty:
+                st.dataframe(overbought[['Close', 'RSI']])
+            else:
+                st.write("No overbought conditions detected.")
 
 pattern_analysis()
