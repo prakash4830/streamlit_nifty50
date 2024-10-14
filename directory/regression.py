@@ -533,7 +533,7 @@ def run_regression_analysis():
         st.plotly_chart(fig_heatmap, use_container_width=True)
         with st.expander("**Interpretation for Correlation Analysis**"):
             st.markdown("""
-        - **1.Nifty50 and Exchange Rates**
+        **1.Nifty50 and Exchange Rates**
             - Nifty50 Annual Mean Close has a strong positive correlation (0.92) with the Exchange Rate Annual Mean Close, 
             suggesting that changes in exchange rates significantly impact the performance of Nifty 50. When the value of 
             the rupee weakens, Nifty 50 tends to show an upward movement, possibly due to better export performance or foreign 
@@ -541,28 +541,28 @@ def run_regression_analysis():
             implying that short-term returns are also influenced by exchange rate fluctuations, but to a lesser extent than the 
             annual closing values.
 
-        - **2.Inflation Rate and Nifty 50:**
+        **2.Inflation Rate and Nifty 50:**
             - The Inflation Rate has a negative correlation (-0.58) with the Nifty50 Annual Mean Close, indicating that higher 
             inflation tends to depress stock prices. This could be attributed to the fact that inflation erodes purchasing power 
             and leads to tighter monetary policy, which can negatively affect stock market performance. The Inflation Rate (Lagged 
             by 1 Year) also has a negative correlation (-0.55) with the Nifty50 Annual Mean Close, confirming that inflation impacts 
             market performance over a longer horizon as well.
 
-        - **3.GDP Growth Rate:**
+        **3.GDP Growth Rate:**
             - The GDP Growth Rate shows a moderate positive correlation (0.48) with Nifty50 Log Returns, indicating that higher economic 
             growth generally leads to better stock market returns. This highlights the importance of economic growth in driving investor 
             confidence and stock market performance. However, the correlation between the GDP Growth Rate and Nifty50 Annual Mean Close 
             is weaker, indicating that the overall stock market index might not be as sensitive to short-term changes in GDP growth as 
             the returns are.
 
-        - **4.S&P 500 and Nifty 50:**
+        **4.S&P 500 and Nifty 50:**
             - The S&P500 Annual Mean Close shows a very high positive correlation (0.98) with the Nifty50 Annual Mean Close, signifying 
             that the Nifty 50 follows global market trends, particularly the U.S. stock market. This is a strong indication of the 
             interconnectedness of the Indian and U.S. economies, where changes in the U.S. market tend to drive corresponding changes in 
             the Indian market. Similarly, S&P500 Log Returns also show a strong positive correlation (0.79) with Nifty50 Log Returns, 
             reinforcing the link between short-term market movements in the U.S. and India.
 
-        - **5. Exchange Rate Lag and Inflation Lag:**
+        **5. Exchange Rate Lag and Inflation Lag:**
             - The Exchange Rate Lag shows a positive correlation (0.29) with the Nifty50 Log Returns, which implies that the previous 
             year's exchange rate has a mild influence on this year's Nifty 50 returns. The Inflation Rate Lag also shows a negative 
             correlation (-0.55) with the Nifty 50, highlighting the lasting impact of inflation over time.
