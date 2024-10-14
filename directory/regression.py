@@ -214,7 +214,7 @@ def run_regression_analysis():
         y_pred = model.predict(X)
 
         # Visualize the Results
-        st.subheader("Actual vs Predicted Annual Log Returns (Nifty 50)")
+        # st.subheader("Actual vs Predicted Annual Log Returns (Nifty 50)")
         fig_scatter = px.scatter(x=y, y=y_pred,
                                  labels={'x': 'Actual Annual Log Returns', 'y': 'Predicted Annual Log Returns'},
                                  title='Actual vs Predicted Annual Log Returns (Nifty 50)')
@@ -227,7 +227,7 @@ def run_regression_analysis():
         X = data[['GDP Growth Rate (%)', 'SP500_Annual_Mean_Log_Returns']]
         ridge = Ridge(alpha=1.0)
         ridge.fit(X, y)
-        st.text(ridge.score(X, y))
+        # st.text(ridge.score(X, y))
         st.plotly_chart(fig_scatter, use_container_width=True)
         with st.expander("**Interpretation for Actual Vs predicted values**"):
             st.markdown("""
