@@ -7,7 +7,7 @@ def create_page(file_path, title, icon,default):
 
 def main():
     # Create pages
-    home_page = create_page("directory/nifty50_intro.py", "Nifty 50: History and Description", icon=":material/info:", default=True)
+    home_page = create_page("directory/nifty50_intro.py", "Nifty 50 Index Overview", icon=":material/info:", default=True)
     page_1 = create_page("directory/eda.py", "Data Collection", icon=":material/data_check:", default=False)
     page_2 = create_page("directory/regression.py", "Regression Analysis", icon=":material/search_insights:", default=False)
     page_3 = create_page("directory/pattern.py", "Pattern Analysis", icon=":material/monitoring:", default=False)
@@ -16,7 +16,7 @@ def main():
     # Set up navigation
     pages = {
         "About": [about_page],
-        "Nifty50": [home_page],
+        "Overview": [home_page],
         "Analysis": [page_1, page_2, page_3],
     }
 
