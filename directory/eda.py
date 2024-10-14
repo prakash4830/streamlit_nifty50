@@ -540,9 +540,21 @@ def run_eda():
         st.plotly_chart(fig_heatmap, use_container_width=True)
         with st.expander("**Interpretation for Correlation Analysis**"):
             st.markdown("""
-        **Interpretation:**
-        - Helps to identify relationships between variables and quantify their strength and direction.
-        - In this exchange rate lag1 and exchange rate has highest correlation of value 0.9577
+        **1.Market Sensitivity to Global Factors:** The Nifty 50 has a strong dependence on global markets, especially 
+        the U.S. market (S&P 500). Both short-term returns and long-term trends in the Nifty 50 follow the movements in 
+        the S&P 500 closely, indicating that macroeconomic events in the U.S. significantly affect the Indian stock market.
+
+        **2.Role of Exchange Rates:** The Nifty 50's performance is heavily influenced by exchange rate movements. The positive 
+        correlation between the exchange rate and Nifty 50 suggests that foreign exchange inflows and outflows could be key 
+        drivers of market trends.
+
+        **3.Inflation's Negative Impact:** High inflation, both current and lagged, negatively impacts the Nifty 50. This could 
+        reflect tightening monetary policies and a reduction in domestic consumption, making inflation an important risk factor 
+        for stock market investors in India.
+
+        **4.Economic Growth and Stock Returns:** GDP growth has a stronger impact on Nifty 50 returns than on the absolute market 
+        index value, suggesting that investors respond more to changes in growth rates in terms of stock returns rather than absolute 
+        levels of the market index.
 
         """)
     else:
