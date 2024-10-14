@@ -314,8 +314,9 @@ def run_eda():
     st.title(":material/data_check: Data Collection, preprocessing and EDA")
     st.markdown("""
     This page fetches and analyzes economic indicators such as GDP Growth Rate, Inflation Rate, Exchange Rates,
-     and Stock Market Indices (Nifty 50 and S&P 500). we are converting the Stock Market Indices date from 
-     non-stationary to stationary by using ***log*** and doning the Exploratory data analysis (EDA).
+     and Stock Market Indices (Nifty 50 and S&P 500) from Yahoo Finance and World Bank API. Then we are converting 
+     the Stock Market Indices data from non-stationary to stationary by using ***log*** and perform the Exploratory 
+     data analysis (EDA).
     """)
 
     # ---------------------------
