@@ -6,7 +6,7 @@ from datetime import date
 
 def display_copyright():
     """Displays the copyright information."""
-    st.sidebar.markdown("---")
+    # st.sidebar.markdown("---")
     st.sidebar.markdown(
         """
         <footer style='text-align: center; margin-top: 20px;'>
