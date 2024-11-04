@@ -463,62 +463,61 @@ def run_regression_analysis():
         # ---------------------------
         # Final Regression Model with Lagged Variables
         # ---------------------------
-        st.subheader("4. Final Regression Model with Lagged Variables")
-        with st.expander("View Lagged Regression Model Details"):
+        # st.subheader("4. Final Regression Model with Lagged Variables")
+        # with st.expander("View Lagged Regression Model Details"):
             # Example of incorporating lagged variables (lagged by 1 year)
-            data['Inflation Rate (%)_Lag1'] = data['Inflation Rate (%)'].shift(1)
-            data['GDP Growth Rate (%)_Lag1'] = data['GDP Growth Rate (%)'].shift(1)
-            data['Exchange_Rate_Lag1'] = data['exchange_rate_Annual_Mean_Log_Returns'].shift(1)
-            data['SP500_Log_Returns_Lag1'] = data['SP500_Annual_Mean_Log_Returns'].shift(1)
+            # data['Inflation Rate (%)_Lag1'] = data['Inflation Rate (%)'].shift(1)
+            # data['GDP Growth Rate (%)_Lag1'] = data['GDP Growth Rate (%)'].shift(1)
+            # data['Exchange_Rate_Lag1'] = data['exchange_rate_Annual_Mean_Log_Returns'].shift(1)
+            # data['SP500_Log_Returns_Lag1'] = data['SP500_Annual_Mean_Log_Returns'].shift(1)
 
             # Drop the first row with NaN values
-            data_lagged = data.dropna().reset_index(drop=True)
+            # data_lagged = data.dropna().reset_index(drop=True)
             # st.write(data_lagged)
-            if not data_lagged.empty:
+            # if not data_lagged.empty:
                 # Define independent variables with lagged terms
-                X_lagged = data_lagged[
-                    ['Inflation Rate (%)_Lag1', 'GDP Growth Rate (%)_Lag1', 'Exchange_Rate_Lag1',
-                     'SP500_Log_Returns_Lag1']]
-                y_lagged = data_lagged['Nifty50_Annual_Mean_Log_Returns']
+                # X_lagged = data_lagged[
+                    # ['Inflation Rate (%)_Lag1', 'GDP Growth Rate (%)_Lag1', 'Exchange_Rate_Lag1',
+                     # 'SP500_Log_Returns_Lag1']]
+                # y_lagged = data_lagged['Nifty50_Annual_Mean_Log_Returns']
 
                 # Add constant
-                X_lagged = sm.add_constant(X_lagged)
+                # X_lagged = sm.add_constant(X_lagged)
 
                 # Fit the OLS model
-                model_lagged = sm.OLS(y_lagged, X_lagged).fit()
+                # model_lagged = sm.OLS(y_lagged, X_lagged).fit()
 
                 # Predictions
-                y_pred_lagged = model_lagged.predict(X_lagged)
+                # y_pred_lagged = model_lagged.predict(X_lagged)
 
                 # Print the Regression Summary
-                st.markdown("**Lagged Regression Summary**")
-                st.text(model_lagged.summary())
+                # st.markdown("**Lagged Regression Summary**")
+                # st.text(model_lagged.summary())
 
                 # Evaluate
-                mse_lagged = mean_squared_error(y_lagged, y_pred_lagged)
-                r2_lagged = r2_score(y_lagged, y_pred_lagged)
-                st.markdown(f"**Lagged Mean Squared Error:** {mse_lagged:.6f}")
-                st.markdown(f"**Lagged R² Score:** {r2_lagged:.6f}")
+                # mse_lagged = mean_squared_error(y_lagged, y_pred_lagged)
+                # r2_lagged = r2_score(y_lagged, y_pred_lagged)
+                # st.markdown(f"**Lagged Mean Squared Error:** {mse_lagged:.6f}")
+                # st.markdown(f"**Lagged R² Score:** {r2_lagged:.6f}")
 
                 # Visualize Lagged Model Results
-                st.markdown("**Actual vs Predicted Annual Log Returns (Lagged Model)**")
-                fig_lagged = px.scatter(x=y_lagged, y=y_pred_lagged,
-                                        labels={'x': 'Actual Annual Log Returns', 'y': 'Predicted Annual Log Returns'},
-                                        title='Actual vs Predicted Annual Log Returns (Nifty 50) - Lagged Model')
-                fig_lagged.add_shape(
-                    type="line",
-                    x0=y_lagged.min(), y0=y_lagged.min(),
-                    x1=y_lagged.max(), y1=y_lagged.max(),
-                    line=dict(color='Black', dash='dash')
-                )
-                st.plotly_chart(fig_lagged, use_container_width=True)
-            else:
-                st.warning("Lagged data is empty after shifting. Cannot perform lagged regression.")
+                # st.markdown("**Actual vs Predicted Annual Log Returns (Lagged Model)**")
+                # fig_lagged = px.scatter(x=y_lagged, y=y_pred_lagged,
+                                        # labels={'x': 'Actual Annual Log Returns', 'y': 'Predicted Annual Log Returns'},
+                                        # title='Actual vs Predicted Annual Log Returns (Nifty 50) - Lagged Model')
+                # fig_lagged.add_shape(
+                    # type="line",
+                    # x0=y_lagged.min(), y0=y_lagged.min(),
+                    # x1=y_lagged.max(), y1=y_lagged.max(),
+                    # line=dict(color='Black', dash='dash'))
+                # st.plotly_chart(fig_lagged, use_container_width=True)
+            # else:
+                # st.warning("Lagged data is empty after shifting. Cannot perform lagged regression.")
 
     # ---------------------------
     # Correlation Analysis
     # ---------------------------
-    st.header("6. Correlation Analysis")
+    st.header("4. Correlation Analysis")
 
     if 'data' in locals() and not data.empty:
         # Compute the correlation matrix
