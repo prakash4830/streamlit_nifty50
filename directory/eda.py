@@ -372,7 +372,7 @@ def run_eda():
     # ---------------------------
     st.header("3. INR to USD Exchange Rate")
 
-    exchange_rate = fetch_stock_data('USDINR=X',start_year=start_date, end_year=end_date)
+    exchange_rate = fetch_stock_data('USDINR=X',start_date=start_date, end_date=end_date)
     if not exchange_rate.empty:
         st.subheader("Exchange Rate Data Sample")
         st.dataframe(exchange_rate)
