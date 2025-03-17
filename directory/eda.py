@@ -153,6 +153,16 @@ def fetch_stock_data(ticker, start_date, end_date):
     - pd.DataFrame: Stock data.
     """
     data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+    # Flatten column names if multi-level header exists
+    if isinstance(data.columns, pd.MultiIndex):
+        data.reset_index(inplace=True)
+        # Convert 'Date' column to datetime format
+        data['Date'] = pd.to_datetime(data['Date'])
+        # Set the 'Date' column back as the index to use resample
+        data.set_index('Date', inplace=True)
+        # Check and flatten MultiIndex columns if present
+        data.columns = ['_'.join(col).strip() for col in data.columns.values]
+        data.columns = [col.split('_')[0] for col in data.columns]
     return data
 
 
@@ -362,7 +372,7 @@ def run_eda():
     # ---------------------------
     st.header("3. INR to USD Exchange Rate")
 
-    exchange_rate = fetch_exchange_rate(start_year=start_date, end_year=end_date)
+    exchange_rate = fetch_stock_data('USDINR=X',start_year=start_date, end_year=end_date)
     if not exchange_rate.empty:
         st.subheader("Exchange Rate Data Sample")
         st.dataframe(exchange_rate)
