@@ -140,31 +140,49 @@ def fetch_exchange_rate(start_year, end_year):
 
 
 @st.cache_data
-def fetch_stock_data(ticker, start_date, end_date):
+def fetch_stock_data(ticker, start_date, end_date, retries=3):
     """
-    Fetches stock data from Yahoo Finance.
+    Fetches stock data using yfinance with retry logic and handles MultiIndex columns.
 
     Parameters:
-    - ticker (str): Stock ticker symbol.
-    - start_date (datetime.date): Start date for data retrieval.
-    - end_date (datetime.date): End date for data retrieval.
+    - ticker (str): Stock ticker symbol (e.g., '^NSEI' for NIFTY 50).
+    - start_date (str or datetime): Start date in 'YYYY-MM-DD' format.
+    - end_date (str or datetime): End date in 'YYYY-MM-DD' format.
+    - retries (int): Number of retry attempts.
 
     Returns:
-    - pd.DataFrame: Stock data.
+    - pd.DataFrame: Cleaned stock data with flattened columns.
     """
-    data = yf.download(ticker, start=start_date, end=end_date, progress=False)
-    # Flatten column names if multi-level header exists
-    if isinstance(data.columns, pd.MultiIndex):
-        data.reset_index(inplace=True)
-        # Convert 'Date' column to datetime format
-        data['Date'] = pd.to_datetime(data['Date'])
-        # Set the 'Date' column back as the index to use resample
-        data.set_index('Date', inplace=True)
-        # Check and flatten MultiIndex columns if present
-        data.columns = ['_'.join(col).strip() for col in data.columns.values]
-        data.columns = [col.split('_')[0] for col in data.columns]
-    return data
+    for attempt in range(retries):
+        try:
+            data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+            if data.empty:
+                raise ValueError(f"No data returned for {ticker} from {start_date} to {end_date}")
 
+            # Reset index to make 'Date' a column
+            data.reset_index(inplace=True)
+
+            # Convert 'Date' column to datetime format
+            data['Date'] = pd.to_datetime(data['Date'])
+
+            # Handle MultiIndex columns (e.g., after corporate actions or dividends)
+            if isinstance(data.columns, pd.MultiIndex):
+                data.columns = ['_'.join(col).strip() for col in data.columns.values]
+                # Optional: simplify names (take only the first part)
+                data.columns = [col.split('_')[0] for col in data.columns]
+
+            # Set 'Date' back as index if needed
+            data.set_index('Date', inplace=True)
+
+            return data
+
+        except Exception as e:
+            print(f"[Attempt {attempt+1}/{retries}] Error: {e}")
+            if attempt < retries - 1:
+                print("Retrying in 60 seconds...")
+                time.sleep(60)
+            else:
+                raise RuntimeError(f"Failed to fetch data for {ticker} after {retries} attempts.")
 
 def calculate_vif(X):
     """
