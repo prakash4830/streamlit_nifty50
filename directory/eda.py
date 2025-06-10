@@ -10,6 +10,7 @@ import requests
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from statsmodels.tsa.stattools import adfuller, kpss
+from datetime import time
 
 # ---------------------------
 # Data Fetching Functions
